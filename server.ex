@@ -12,7 +12,10 @@ defmodule Server do
     IO.write("Starting server... \n")
     case :gen_tcp.listen(port, opt) do
       {:ok, listen} ->
-        handler(listen)
+        spawn(fn() -> handler(listen) end)
+        spawn(fn() -> handler(listen) end)
+        spawn(fn() -> handler(listen) end)
+        spawn(fn() -> handler(listen) end)
         :gen_tcp.close(listen)
         :ok
       {:error, error} ->
@@ -24,7 +27,9 @@ defmodule Server do
     IO.write("Waiting for clients... \n")
     case :gen_tcp.accept(listen) do
       {:ok, client} ->
-        request(client)
+        #concurrency
+        spawn(fn() -> request(client) end)
+        #request(client)
         handler(listen)
       {:error, error} ->
         error
@@ -49,7 +54,7 @@ defmodule Server do
 
   def reply(request) do
     time = get_time()
-    :timer.sleep(10)
+    #:timer.sleep(100)
     HTTP.ok("<html> #{time} </html>")
   end
 
